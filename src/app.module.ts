@@ -1,10 +1,18 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { PostgresModule } from './postgres/postgres.module';
+import { ConfigModule } from '@nestjs/config';
+import configs from './configs';
+import { loggerFactory } from './utilities/LoggerFactory';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: configs,
+    }),
+    PostgresModule,
+  ],
+  providers: [loggerFactory()],
+  controllers: [],
 })
 export class AppModule {}
