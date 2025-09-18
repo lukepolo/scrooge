@@ -56,7 +56,8 @@ export class PostgresService {
       'create table if not exists schema_migrations (version bigint not null, dirty boolean not null)',
     );
 
-    await this.applyMigrations(path.resolve('./migrations'));
+    await this.applyMigrations(path.resolve('./db/migrations'));
+    await this.apply(path.resolve('./db/triggers'));
   }
 
   private async applyMigrations(path: string): Promise<number> {

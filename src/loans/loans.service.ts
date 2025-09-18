@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PostgresService } from '../postgres/postgres.service';
 import { LoanDenied } from './errors/LoanDenied';
 import { LoanNotFound } from './errors/LoanNotFound';
@@ -6,10 +6,7 @@ import { LoanPaymentExceeded } from './errors/LoanPaymentExceeded';
 
 @Injectable()
 export class LoansService {
-  constructor(
-    private readonly logger: Logger,
-    private readonly postgresService: PostgresService,
-  ) {}
+  constructor(private readonly postgresService: PostgresService) {}
 
   public async applyForLoan(
     userId: string,
@@ -70,5 +67,37 @@ export class LoansService {
     );
 
     return { loanId, paid: newRemaining === 0, remaining: newRemaining };
+  }
+
+  public async getTransactions(
+    userId: string,
+    loanId: string,
+  ): Promise<
+    Array<{
+      transaction_id: string;
+      previous_balance: number;
+      new_balance: number;
+      posted_date: string;
+    }>
+  > {
+    const [loan] = await this.postgresService.query<
+      Array<{ id: number; amount: number; remaining: number }>
+    >('select * from loans where id = $1 and user_id = $2', [loanId, userId]);
+
+    if (!loan) {
+      throw new LoanNotFound();
+    }
+
+    return await this.postgresService.query<
+      Array<{
+        transaction_id: string;
+        previous_balance: number;
+        new_balance: number;
+        posted_date: string;
+      }>
+    >(
+      'select id as transaction_id, previous_balance, new_balance, created_at as posted_date from loan_transactions where loan_id = $1',
+      [loanId],
+    );
   }
 }
