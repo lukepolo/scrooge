@@ -57,7 +57,6 @@ export class LoansController {
       }
       res.json(await this.loansService.applyForLoan(userId, amount));
     } catch (error) {
-      console.log('error', error);
       if (error instanceof Error) {
         res.status(400).json({ error: error.message });
         return;

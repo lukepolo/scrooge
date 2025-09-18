@@ -25,7 +25,6 @@ export class LoansService {
 
     // TODO - need a lock to verify transaction bank balance is sufficient
 
-    console.log('banksAccount', banksAccount);
     const bankBalance = banksAccount.balance;
     if (amount > bankBalance) {
       throw new LoanDenied();
