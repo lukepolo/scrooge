@@ -18,7 +18,7 @@ export class LoansController {
     private readonly loansService: LoansService,
   ) {}
 
-  @Get('/:loanId')
+  @Get('/:loanId/transactions')
   public async getTransactions(
     @Param('loanId') loanId: string,
     @Query('userId') userId: string,

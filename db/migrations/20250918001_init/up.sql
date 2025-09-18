@@ -1,5 +1,5 @@
 CREATE SCHEMA IF NOT EXISTS scrooge;
 
-create schema "migration_hashes";
+CREATE SCHEMA IF NOT EXISTS "migration_hashes";
 
-CREATE TABLE "migration_hashes"."hashes" ("name" text NOT NULL, "hash" text NOT NULL, PRIMARY KEY ("name") );
+CREATE TABLE IF NOT EXISTS "migration_hashes"."hashes" ("name" text NOT NULL, "hash" text NOT NULL, PRIMARY KEY ("name") );

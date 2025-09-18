@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AccountsController } from './accounts.controller';
 import { AccountsService } from './accounts.service';
+import { TransactionsService } from './transactions.service';
 import { Logger } from '@nestjs/common';
 import { type Response } from 'express';
 /* eslint-disable @typescript-eslint/unbound-method */
@@ -9,6 +10,9 @@ describe('AccountsController', () => {
   let controller: AccountsController;
   let accountsService: jest.Mocked<
     Pick<AccountsService, 'openAccount' | 'closeAccount' | 'getAccount'>
+  >;
+  let transactionsService: jest.Mocked<
+    Pick<TransactionsService, 'getTransactions' | 'despoit' | 'withdraw'>
   >;
   let logger: { log: jest.Mock; error: jest.Mock };
 
@@ -30,12 +34,19 @@ describe('AccountsController', () => {
       getAccount: jest.fn(),
     };
 
+    transactionsService = {
+      getTransactions: jest.fn(),
+      despoit: jest.fn(),
+      withdraw: jest.fn(),
+    };
+
     logger = { log: jest.fn(), error: jest.fn() };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AccountsController],
       providers: [
         { provide: AccountsService, useValue: accountsService },
+        { provide: TransactionsService, useValue: transactionsService },
         { provide: Logger, useValue: logger },
       ],
     }).compile();

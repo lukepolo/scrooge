@@ -1,13 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PostgresService } from '../postgres/postgres.service';
 import { AccountsService } from '../accounts/accounts.service';
-import { UnableToUpdateBalance } from './errors/UnableToupdateBalance';
-import { InsufficientFunds } from './errors/InsufficientFunds';
+import { UnableToUpdateBalance } from '../accounts/errors/UnableToupdateBalance';
+import { InsufficientFunds } from '../accounts/errors/InsufficientFunds';
 
 @Injectable()
 export class TransactionsService {
   constructor(
-    private readonly logger: Logger,
     private readonly postgresService: PostgresService,
     private readonly accountsService: AccountsService,
   ) {}

@@ -5,7 +5,6 @@ import configs from './configs';
 import { loggerFactory } from './utilities/LoggerFactory';
 import { AccountsModule } from './accounts/accounts.module';
 import { LoansModule } from './loans/loans.module';
-import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
   imports: [
@@ -16,7 +15,6 @@ import { TransactionsModule } from './transactions/transactions.module';
     PostgresModule,
     AccountsModule,
     LoansModule,
-    TransactionsModule,
   ],
   providers: [loggerFactory()],
   controllers: [],
