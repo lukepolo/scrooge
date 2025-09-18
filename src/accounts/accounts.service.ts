@@ -11,7 +11,7 @@ export class AccountsService {
     private readonly postgresService: PostgresService,
   ) {}
 
-  public async openAccount(userId: string) : Promise<number> {
+  public async openAccount(userId: string): Promise<number> {
     const [account] = await this.postgresService.query<
       Array<{ id: number; deleted_at: string }>
     >('select id, deleted_at from accounts where user_id = $1', [userId]);
@@ -37,16 +37,7 @@ export class AccountsService {
   }
 
   public async closeAccount(userId: string, accountId: string) {
-    const [account] = await this.postgresService.query<
-      Array<{ id: number; deleted_at: string }>
-    >('select id, deleted_at from accounts where id = $1 and user_id = $2', [
-      parseInt(accountId),
-      userId,
-    ]);
-
-    if (!account) {
-      throw new AccountNotFound();
-    }
+    const account = await this.getAccount(userId, accountId);
 
     if (account.deleted_at) {
       throw new AccountAlreadyClosed();
@@ -58,5 +49,23 @@ export class AccountsService {
     );
 
     this.logger.log(`Account closed ${accountId} for user ${userId}`);
+  }
+
+  public async getAccount(
+    userId: string,
+    accountId: string,
+  ): Promise<{ id: number; balance: number; deleted_at: string }> {
+    const [account] = await this.postgresService.query<
+      Array<{ id: number; deleted_at: string; balance: number }>
+    >(
+      'select id, balance, deleted_at from accounts where id = $1 and user_id = $2',
+      [parseInt(accountId), userId],
+    );
+
+    if (!account) {
+      throw new AccountNotFound();
+    }
+
+    return account;
   }
 }

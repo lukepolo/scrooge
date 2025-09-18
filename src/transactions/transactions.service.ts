@@ -1,10 +1,67 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PostgresService } from '../postgres/postgres.service'; 
+import { PostgresService } from '../postgres/postgres.service';
+import { AccountsService } from '../accounts/accounts.service';
+import { UnableToUpdateBalance } from './errors/UnableToupdateBalance';
+import { InsufficientFunds } from './errors/InsufficientFunds';
 
 @Injectable()
 export class TransactionsService {
-    constructor(
-        private readonly logger: Logger,
-        private readonly postgresService: PostgresService,
-    ) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly postgresService: PostgresService,
+    private readonly accountsService: AccountsService,
+  ) {}
+
+  public async despoit(
+    userId: string,
+    accountId: string,
+    amount: number,
+  ): Promise<{ balance: number }> {
+    await this.accountsService.getAccount(userId, accountId);
+
+    const results = await this.postgresService.query<
+      Array<{
+        balance: number;
+      }>
+    >(
+      'update accounts set balance = balance + $1 where id = $2 returning balance',
+      [amount, accountId],
+    );
+
+    const balance = results.at(0)?.balance;
+    if (!balance) {
+      throw new UnableToUpdateBalance();
+    }
+
+    return { balance };
+  }
+
+  public async withdraw(
+    userId: string,
+    accountId: string,
+    amount: number,
+  ): Promise<{ balance: number }> {
+    const account = await this.accountsService.getAccount(userId, accountId);
+
+    if (account.balance < amount) {
+      throw new InsufficientFunds(account.balance, amount);
+    }
+
+    const results = await this.postgresService.query<
+      Array<{
+        balance: number;
+      }>
+    >(
+      'update accounts set balance = balance - $1 where id = $2 returning balance',
+      [amount, accountId],
+    );
+
+    const balance = results.at(0)?.balance;
+
+    if (!balance) {
+      throw new UnableToUpdateBalance();
+    }
+
+    return { balance };
+  }
 }

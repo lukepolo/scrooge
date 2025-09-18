@@ -6,6 +6,7 @@ import { AccountsController } from './accounts.controller';
 
 @Module({
   imports: [PostgresModule],
+  exports: [AccountsService],
   providers: [AccountsService, loggerFactory()],
   controllers: [AccountsController],
 })

@@ -1,8 +1,14 @@
-import { Body, Controller, Param, Post, Delete, Res, Logger } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  Post,
+  Delete,
+  Res,
+  Logger,
+} from '@nestjs/common';
 import { AccountsService } from './accounts.service';
 import { type Response } from 'express';
-import { AccountAlreadyClosed } from './errors/AccountAlreadyClosed';
-import { AccountNotFound } from './errors/AccountNotFound';
 
 @Controller('accounts')
 export class AccountsController {
@@ -30,12 +36,8 @@ export class AccountsController {
 
       res.status(200).json(result);
     } catch (error: any) {
-      if (
-        error instanceof Error &&
-        error.message === 'user already has an open account'
-      ) {
-        res.status(400).json({ error: error.message, accountId: userId });
-
+      if (error instanceof Error) {
+        res.status(400).json({ error: error.message });
         return;
       }
 
@@ -70,10 +72,7 @@ export class AccountsController {
       await this.accountsService.closeAccount(userId, accountId);
       res.send();
     } catch (error: any) {
-      if (
-        error instanceof AccountAlreadyClosed ||
-        error instanceof AccountNotFound
-      ) {
+      if (error instanceof Error) {
         res.status(400).json({ error: error.message });
         return;
       }
