@@ -17,14 +17,11 @@ export class AccountsController {
     private readonly accountsService: AccountsService,
   ) {}
 
-  @Post('open')
+  @Post('/')
   public async open(
     @Body('userId') userId: string,
     @Res() res: Response,
-  ): Promise<void | {
-    error?: string;
-    accountId?: string;
-  }> {
+  ): Promise<void> {
     try {
       if (!userId) {
         // TODO - add validation service
@@ -49,14 +46,12 @@ export class AccountsController {
     }
   }
 
-  @Delete(':accountId/close')
+  @Delete(':accountId')
   public async close(
     @Body('userId') userId: string,
     @Param('accountId') accountId: string,
     @Res() res: Response,
-  ): Promise<void | {
-    error?: string;
-  }> {
+  ): Promise<void> {
     if (!userId) {
       res.status(400).json({ error: 'userId is required' });
       return;
